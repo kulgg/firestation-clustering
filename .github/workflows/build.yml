@@ -1,0 +1,33 @@
+name: build
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
+      - uses: actions/setup-python@v3
+        name: Setup python with cached poetry environment
+        with:
+          python-version: "3.10"
+          cache: "poetry"
+      - name: Poetry install
+        run: |
+          poetry install
+      - name: Lint with flake8
+        run: |
+          poetry run flake8
+      - name: Test with pytest
+        run: |
+          poetry run pytest
