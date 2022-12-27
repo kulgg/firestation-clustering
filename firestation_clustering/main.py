@@ -1,6 +1,8 @@
 import logging
 import yaml
 
+from firestation_clustering.maps import Maps
+
 
 def load_config():
     config = {}
@@ -18,4 +20,5 @@ def main():
     config = load_config()
     configure_logging()
     logging.info("hello")
-    logging.info(config)
+    maps = Maps(config["gmaps"])
+    maps.do()
