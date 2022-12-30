@@ -15,16 +15,8 @@ class Area:
 
 class Maps:
     def __init__(self, config):
-        self.gmaps = googlemaps.Client(key=config["api-key"])
+        self.gmaps: googlemaps.Client = googlemaps.Client(key=config["api-key"])
         self.city = None
-
-    def do(self):
-        now = datetime.now()
-        directions_result = self.gmaps.directions(
-            "Sydney Town Hall", "Parramatta, NSW", mode="transit", departure_time=now
-        )
-
-        logging.info(directions_result)
 
     def set_city(self, city_name):
         geocode_result = self.gmaps.geocode(city_name)[0]
@@ -42,3 +34,24 @@ class Maps:
         lng = random.uniform(self.city.min_lng, self.city.max_lng)
 
         return (lat, lng)
+
+    def get_city_map(self, fires, stations):
+        center_lat = (self.city.min_lat + self.city.max_lat) / 2
+        center_lng = (self.city.min_lng + self.city.max_lng) / 2
+
+        fire_markers_string = "icon:https://i.ibb.co/8X2GjdL/fire.png|" + "|".join(
+            f"{lat},{lng}" for lat, lng in fires
+        )
+
+        station_markers_string = "color:blue|label:S|" + "|".join(
+            f"{lat},{lng}" for lat, lng in stations
+        )
+
+        map_img = self.gmaps.static_map(
+            center=f"{center_lat},{center_lng}",
+            size=(1000, 1000),
+            zoom=11.8,
+            markers=[fire_markers_string, station_markers_string],
+        )
+
+        return map_img
