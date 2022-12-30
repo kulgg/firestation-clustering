@@ -21,4 +21,7 @@ def main():
     configure_logging()
     logging.info("hello")
     maps = Maps(config["gmaps"])
-    maps.do()
+    maps.set_city("Berlin")
+
+    for _ in range(10):
+        logging.info(maps.get_random_point())
