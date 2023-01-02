@@ -1,4 +1,3 @@
-import logging
 import random
 import googlemaps
 from dataclasses import dataclass
