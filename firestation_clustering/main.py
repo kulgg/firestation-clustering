@@ -1,10 +1,15 @@
 import logging
 import os
+import statistics
 from fire import Fire
 import yaml
 from sklearn.cluster import KMeans
 
 from firestation_clustering.maps import Maps
+
+
+def chunker(seq, size):
+    return (seq[pos : pos + size] for pos in range(0, len(seq), size))
 
 
 def load_config():
@@ -54,7 +59,7 @@ class CommandsHandler:
             ).fit(fires)
             fire_stations = kmeans.cluster_centers_
 
-    def kmeans_driving_time(self, city, num_stations, num_fires=10, iterations=10):
+    def kmeans_driving_time(self, city, num_stations, num_fires=100, iterations=10):
         maps = Maps(self.config["gmaps"])
         maps.set_city(city)
 
@@ -67,26 +72,34 @@ class CommandsHandler:
             lat, lng = maps.get_random_point()
             fire_stations.append((lat, lng))
 
-        # The nearby fires of all fire stations
-        nearby_fires = [[] for i in range(num_stations)]
+        f_stations = open(f"out/{city}/driving-time/stations.txt", "w")
+        fires = []
+        for j in range(iterations):
+            logging.info("Iteration %d", j)
+            f_stations.write(f"Iteration {j}\n")
+            f_stations.write(
+                " ".join(f"{lat},{lng}" for lat, lng in fire_stations) + "\n\n"
+            )
 
-        for i in range(iterations):
+            map_img = maps.get_city_map(fires, fire_stations)
+            with open(f"out/{city}/driving-time/{j}.png", "wb") as f:
+                for chunk in map_img:
+                    if chunk:
+                        f.write(chunk)
+
             fires = []
             for _ in range(num_fires):
                 lat, lng = maps.get_random_point()
                 fires.append((lat, lng))
 
             # every row contains the driving time seconds to all fire stations for a fire
-            driving_time = maps.get_driving_time_matrix(fires, fire_stations)
-            map_img = maps.get_city_map(
-                [fire for sub_list in nearby_fires for fire in sub_list], fire_stations
-            )
+            num_fires_per_request = 100 // num_stations
+            driving_time = []
+            for chunk in chunker(fires, num_fires_per_request):
+                driving_time.extend(maps.get_driving_time_matrix(chunk, fire_stations))
 
-            with open(f"out/{city}/driving-time/{i}.png", "wb") as f:
-                for chunk in map_img:
-                    if chunk:
-                        f.write(chunk)
-
+            # The nearby fires of all fire stations
+            nearby_fires = [[] for i in range(num_stations)]
             for i in range(len(driving_time)):
                 fire_to_stations_time = driving_time[i]
                 nearest_index = fire_to_stations_time.index(min(fire_to_stations_time))
@@ -102,7 +115,32 @@ class CommandsHandler:
                     lng += fire[1]
                 lat /= len(nearby_fires[i])
                 lng /= len(nearby_fires[i])
-                fire_stations[i] = (lat, lng)
+
+                potential_stations = [(lat, lng), fire_stations[i]]
+                potential_stations.extend(nearby_fires[i])
+                logging.info("Len potential_stations %d", len(potential_stations))
+
+                num_per_request = 100 // len(potential_stations)
+                driving_time = []
+                for chunk in chunker(potential_stations, num_per_request):
+                    tmp = [[] for _ in range(len(chunk))]
+                    for chunk_two in chunker(potential_stations, num_per_request):
+                        res = maps.get_driving_time_matrix(chunk, chunk_two)
+                        for k in range(len(chunk)):
+                            tmp[k].extend(res[k])
+                    driving_time.extend(tmp)
+
+                assert len(driving_time) == len(potential_stations)
+                driving_time = [
+                    statistics.mean(drive_times_from_station)
+                    for drive_times_from_station in driving_time
+                ]
+                best_mean_drive_time = min(driving_time)
+                logging.info(best_mean_drive_time)
+                best_station_index = driving_time.index(best_mean_drive_time)
+                logging.info(best_station_index)
+                fire_stations[i] = potential_stations[best_station_index]
+        f_stations.close()
 
 
 def main():

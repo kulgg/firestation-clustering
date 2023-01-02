@@ -16,6 +16,7 @@ class Maps:
     def __init__(self, config):
         self.gmaps: googlemaps.Client = googlemaps.Client(key=config["api-key"])
         self.city = None
+        self.prev_stations = []
 
     def set_city(self, city_name):
         geocode_result = self.gmaps.geocode(city_name)[0]
@@ -42,12 +43,16 @@ class Maps:
             f"{lat},{lng}" for lat, lng in fires
         )
 
-        station_markers_string = "color:blue|label:S|" + "|".join(
+        station_markers_string = "color:blue|label:N|" + "|".join(
             f"{lat},{lng}" for lat, lng in stations
         )
 
-        markers_string = [station_markers_string]
-        if len(fires) <= 100:
+        prev_station_markers_string = "color:red|label:O|" + "|".join(
+            f"{lat},{lng}" for lat, lng in self.prev_stations
+        )
+
+        markers_string = [station_markers_string, prev_station_markers_string]
+        if len(markers_string) + len(fires) <= 150:
             markers_string.append(fire_markers_string)
 
         map_img = self.gmaps.static_map(
@@ -56,6 +61,8 @@ class Maps:
             zoom=11.8,
             markers=markers_string,
         )
+
+        self.prev_stations = [s for s in stations]
 
         return map_img
 
