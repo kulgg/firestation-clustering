@@ -1,3 +1,4 @@
+import logging
 import random
 import googlemaps
 from dataclasses import dataclass
@@ -45,11 +46,25 @@ class Maps:
             f"{lat},{lng}" for lat, lng in stations
         )
 
+        markers_string = [station_markers_string]
+        if len(fires) <= 100:
+            markers_string.append(fire_markers_string)
+
         map_img = self.gmaps.static_map(
             center=f"{center_lat},{center_lng}",
             size=(1000, 1000),
             zoom=11.8,
-            markers=[fire_markers_string, station_markers_string],
+            markers=markers_string,
         )
 
         return map_img
+
+    def get_driving_time_matrix(self, origins, destinations):
+        matrix = self.gmaps.distance_matrix(origins, destinations, mode="driving")
+
+        driving_time = [
+            [row["elements"][i]["duration"]["value"] for i in range(len(destinations))]
+            for row in matrix["rows"]
+        ]
+
+        return driving_time
