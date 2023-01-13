@@ -4,6 +4,7 @@ import statistics
 from fire import Fire
 import yaml
 from sklearn.cluster import KMeans
+from firestation_clustering.mapbox import MapBox
 
 from firestation_clustering.maps import Maps
 
@@ -142,6 +143,24 @@ class CommandsHandler:
                 fire_stations[i] = potential_stations[best_station_index]
         f_stations.close()
 
+    def test(self):
+        mb = MapBox(self.config["mapbox"]["token"])
+        # coordinates = [(-122.42, 37.78), (-122.45, 37.91), (-122.48, 37.73)]
+        # logging.info(mb.distance_matrix(coordinates))
+
+        output_image_to_path(
+            "out/test.jpg",
+            mb.static_map(
+                [
+                    51.410443,
+                    7.102131,
+                ],
+                width=1200,
+                height=1200,
+                bearing=0.3,
+            ),
+        )
+
     def testing(self):
         maps = Maps(self.config["gmaps"])
         maps.get_random_point_in_weighted_probability_district()
@@ -161,9 +180,7 @@ def get_fire_of_districts(self, number_of_fires) -> list:
 
 def output_image_to_path(path: str, image) -> None:
     with open(path, "wb") as f:
-        for chunk in image:
-            if chunk:
-                f.write(chunk)
+        f.write(image)
 
 
 def main():
