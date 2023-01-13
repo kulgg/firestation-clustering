@@ -47,7 +47,7 @@ class CommandsHandler:
                 lat, lng = maps.get_random_point()
                 fires.append((lat, lng))
 
-            map_img = maps.get_city_map(fires, fire_stations)
+            map_img = maps.get_city_map_with_fires_and_stations(fires, fire_stations)
 
             with open(f"out/{city}/euclid/{i}.png", "wb") as f:
                 for chunk in map_img:
@@ -81,7 +81,7 @@ class CommandsHandler:
                 " ".join(f"{lat},{lng}" for lat, lng in fire_stations) + "\n\n"
             )
 
-            map_img = maps.get_city_map(fires, fire_stations)
+            map_img = maps.get_city_map_with_fires_and_stations(fires, fire_stations)
             with open(f"out/{city}/driving-time/{j}.png", "wb") as f:
                 for chunk in map_img:
                     if chunk:
@@ -141,6 +141,46 @@ class CommandsHandler:
                 logging.info(best_station_index)
                 fire_stations[i] = potential_stations[best_station_index]
         f_stations.close()
+
+    def testing(self):
+        dict_population_info = {
+            "Bochum-Mitte": 103918,
+            "Bochum-Wattenscheid": 72821,
+            "Bochum-Nord": 35458,
+            "Bochum-Ost": 52885,
+            "Bochum-Süd": 50612,
+            "Bochum-Südwest": 54452,
+        }
+
+        spawn_fire_of_districts(self, "Bochum", dict_population_info)
+
+
+# returns single map with spawned fires
+# parameters: city_name is the name of the whole city, the district_population_info is a dict with key of district_name and value of population number
+def spawn_fire_of_districts(
+    self, city_name: str, district_population_info: dict
+) -> Maps:
+    # whole_map = Maps(self.config["gmaps"])
+    # whole_map.set_city(city_name)
+
+    district_maps = {}
+    # create maps for given districts
+    for district_name in district_population_info.keys():
+        district_map = Maps(self.config["gmaps"])
+        district_map.set_city(district_name)
+
+        output_image_to_path(
+            "out/{city_name}/{district_name}.png", district_map.get_city_map
+        )
+
+        district_maps[district_name] = district_map
+
+
+def output_image_to_path(path: str, image) -> None:
+    with open(path, "wb") as f:
+        for chunk in image:
+            if chunk:
+                f.write(chunk)
 
 
 def main():

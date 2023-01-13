@@ -34,7 +34,7 @@ class Maps:
 
         return (lat, lng)
 
-    def get_city_map(self, fires, stations):
+    def get_city_map_with_fires_and_stations(self, fires, stations):
         center_lat = (self.city.min_lat + self.city.max_lat) / 2
         center_lng = (self.city.min_lng + self.city.max_lng) / 2
 
@@ -62,6 +62,16 @@ class Maps:
         )
 
         self.prev_stations = [s for s in stations]
+
+        return map_img
+
+    def get_city_map(self):
+        center_lat = (self.city.min_lat + self.city.max_lat) / 2
+        center_lng = (self.city.min_lng + self.city.max_lng) / 2
+
+        map_img = self.gmaps.static_map(
+            center=f"{center_lat},{center_lng}", size=(1000, 1000), zoom=11.8
+        )
 
         return map_img
 
