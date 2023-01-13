@@ -152,8 +152,8 @@ class CommandsHandler:
             "out/test.jpg",
             mb.static_map(
                 [
-                    7.102131,
                     51.410443,
+                    7.102131,
                 ],
                 width=1200,
                 height=1200,

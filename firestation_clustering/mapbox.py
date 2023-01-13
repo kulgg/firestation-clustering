@@ -37,7 +37,7 @@ class MapBox:
         }
 
         response = requests.get(
-            f"https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/{center[0]},{center[1]},{zoom},{bearing},{pitch}/{width}x{height}",
+            f"https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/{center[1]},{center[0]},{zoom},{bearing},{pitch}/{width}x{height}",
             params=params,
         )
 
