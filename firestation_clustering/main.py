@@ -144,9 +144,22 @@ class CommandsHandler:
         f_stations.close()
 
     def test(self):
-        mb = MapBox()
-        coordinates = [(-122.42, 37.78), (-122.45, 37.91), (-122.48, 37.73)]
-        logging.info(mb.distance_matrix(coordinates))
+        mb = MapBox(self.config["mapbox"]["token"])
+        # coordinates = [(-122.42, 37.78), (-122.45, 37.91), (-122.48, 37.73)]
+        # logging.info(mb.distance_matrix(coordinates))
+
+        output_image_to_path(
+            "out/test.jpg",
+            mb.static_map(
+                [
+                    7.102131,
+                    51.410443,
+                ],
+                width=1200,
+                height=1200,
+                bearing=0.3,
+            ),
+        )
 
     def testing(self):
         dict_population_info = {
@@ -184,9 +197,7 @@ def spawn_fire_of_districts(
 
 def output_image_to_path(path: str, image) -> None:
     with open(path, "wb") as f:
-        for chunk in image:
-            if chunk:
-                f.write(chunk)
+        f.write(image)
 
 
 def main():

@@ -3,14 +3,14 @@ import requests
 
 
 class MapBox:
-    def __init__(self):
-        pass
+    def __init__(self, token):
+        self.token = token
 
-    def distance_matrix(self, coordinates: List[Tuple[int, int]]):
+    def distance_matrix(self, coordinates: List[Tuple[float, float]]):
         params = (
             (
                 "access_token",
-                "pk.eyJ1IjoiZ2x5Y2luY2hlY2siLCJhIjoiY2xjdDFvdDlhMHN4MzNwcDN5bzQ2d3lseiJ9.s4tYQvLfT1eNafvNwsQ5Mw",
+                self.token,
             ),
         )
 
@@ -22,3 +22,23 @@ class MapBox:
         )
 
         return response.json()
+
+    def static_map(
+        self,
+        center: Tuple[float, float],
+        zoom=14,
+        bearing=0,
+        pitch=60,
+        width=400,
+        height=400,
+    ):
+        params = {
+            "access_token": self.token,
+        }
+
+        response = requests.get(
+            f"https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/{center[0]},{center[1]},{zoom},{bearing},{pitch}/{width}x{height}",
+            params=params,
+        )
+
+        return response.content
