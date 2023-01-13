@@ -7,3 +7,9 @@
 3. Insert api-key in config.yaml
 4. `poetry install`
 5. `poetry run x`
+
+## ToDo
+
+- [ ] Switch everything to mapbox
+- [ ] Probabilistic fire spawning
+- [ ] Log all relevant data in every iteration
