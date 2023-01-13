@@ -1,4 +1,5 @@
 import random
+from typing import List
 import googlemaps
 from dataclasses import dataclass
 
@@ -11,10 +12,22 @@ class Area:
     max_lng: float
 
 
+@dataclass
+class District(Area):
+    probability: float
+
+
 class Maps:
     def __init__(self, config):
         self.gmaps: googlemaps.Client = googlemaps.Client(key=config["api-key"])
-        self.city = None
+        self.city = Area(49.0, 50.0, 7.0, 8.0)
+        self.districts: List[District] = [
+            District(49.0, 50.0, 7.0, 8.0, 0.28),
+            District(49.0, 50.0, 7.0, 8.0, 0.28),
+            District(49.0, 50.0, 7.0, 8.0, 0.28),
+            District(49.0, 50.0, 7.0, 8.0, 0.28),
+            District(49.0, 50.0, 7.0, 8.0, 0.28),
+        ]
         self.prev_stations = []
 
     def set_city(self, city_name):
@@ -28,7 +41,7 @@ class Maps:
             max_lng=bounds["northeast"]["lng"],
         )
 
-    def get_random_point(self):
+    def get_random_point(self, probablistic: bool = False):
         lat = random.uniform(self.city.min_lat, self.city.max_lat)
         lng = random.uniform(self.city.min_lng, self.city.max_lng)
 
