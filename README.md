@@ -10,6 +10,9 @@
 
 ## ToDo
 
-- [ ] Switch everything to mapbox
-- [ ] Probabilistic fire spawning
+- [x] Switch everything to mapbox
+- [x] Probabilistic fire spawning
 - [ ] Log all relevant data in every iteration
+  - Firestation locations
+  - Fire locations
+  - Driving times /euclid distance
