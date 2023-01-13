@@ -2,6 +2,7 @@ import random
 from typing import List
 import googlemaps
 from dataclasses import dataclass
+from numpy.random import choice
 
 
 @dataclass
@@ -12,40 +13,46 @@ class Area:
     max_lng: float
 
 
-@dataclass
-class District(Area):
-    probability: float
-
-
 class Maps:
     def __init__(self, config):
-        self.gmaps: googlemaps.Client = googlemaps.Client(key=config["api-key"])
+        #self.gmaps: googlemaps.Client = googlemaps.Client(key=config["api-key"])
         self.city = Area(51.410443, 51.531295, 7.102131, 7.349272)
-        self.districts: List[District] = [
-            District(49.0, 50.0, 7.0, 8.0, 0.28),
-            District(49.0, 50.0, 7.0, 8.0, 0.28),
-            District(49.0, 50.0, 7.0, 8.0, 0.28),
-            District(49.0, 50.0, 7.0, 8.0, 0.28),
-            District(49.0, 50.0, 7.0, 8.0, 0.28),
+        
+        #1 "Bochum-Mitte": 103918,
+        #2 "Bochum-Wattenscheid": 72821,
+        #3 "Bochum-Nord": 35458,
+        #4 "Bochum-Ost": 52885,
+        #5 "Bochum-Süd": 50612,
+        #6 "Bochum-Südwest": 54452,
+        #totale anzahl in bochum = 370.146
+        
+        self.district_locations: List[Area] = [
+            Area(51.457411, 51.521568, 7.154114, 7.266257),
+            Area(51.436690, 51.505821, 7.102756, 7.180607),
+            Area(51.481955, 51.532128, 7.232064, 7.316238),
+            Area(51.457872, 51.504190, 7.254022, 7.348968),
+            Area(51.412156, 51.475234, 7.185753, 7.298447),
+            Area(51.412594, 51.478328, 7.120075, 7.217956),
         ]
+
+        self.district_probabilites = [0.28, 0.20, 0.10, 0.14, 0.13, 0.15]
+
         self.prev_stations = []
 
-    def set_city(self, city_name):
-        geocode_result = self.gmaps.geocode(city_name)[0]
-        bounds = geocode_result["geometry"]["bounds"]
-
-        self.city = Area(
-            min_lat=bounds["southwest"]["lat"],
-            max_lat=bounds["northeast"]["lat"],
-            min_lng=bounds["southwest"]["lng"],
-            max_lng=bounds["northeast"]["lng"],
-        )
-
-    def get_random_point(self, probablistic: bool = False):
+    def get_random_point_in_city(self):
         lat = random.uniform(self.city.min_lat, self.city.max_lat)
         lng = random.uniform(self.city.min_lng, self.city.max_lng)
 
         return (lat, lng)
+
+    def get_random_point_in_weighted_probability_district(self):
+
+        index_of_chosen_district = choice([0, 1, 2, 3, 4, 5], 1, p=self.district_probabilites)
+
+        lat = random.uniform(self.district_locations[index_of_chosen_district][0], self.district_locations[index_of_chosen_district][1])
+        long = random.uniform(self.district_locations[index_of_chosen_district][2], self.district_locations[index_of_chosen_district][3])
+
+        return (lat, long)
 
     def get_city_map_with_fires_and_stations(self, fires, stations):
         center_lat = (self.city.min_lat + self.city.max_lat) / 2

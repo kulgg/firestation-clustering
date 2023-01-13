@@ -143,38 +143,21 @@ class CommandsHandler:
         f_stations.close()
 
     def testing(self):
-        dict_population_info = {
-            "Bochum-Mitte": 103918,
-            "Bochum-Wattenscheid": 72821,
-            "Bochum-Nord": 35458,
-            "Bochum-Ost": 52885,
-            "Bochum-Süd": 50612,
-            "Bochum-Südwest": 54452,
-        }
-
-        spawn_fire_of_districts(self, "Bochum", dict_population_info)
+        maps = Maps(self.config["gmaps"])
+        maps.get_random_point_in_weighted_probability_district()
 
 
 # returns single map with spawned fires
 # parameters: city_name is the name of the whole city, the district_population_info is a dict with key of district_name and value of population number
-def spawn_fire_of_districts(
-    self, city_name: str, district_population_info: dict
-) -> Maps:
-    # whole_map = Maps(self.config["gmaps"])
-    # whole_map.set_city(city_name)
+def get_fire_of_districts(self, number_of_fires) -> list:
+    city_map = Maps(self.config["gmaps"])
+    city_map.set_city("Bochum")
 
-    district_maps = {}
-    # create maps for given districts
-    for district_name in district_population_info.keys():
-        district_map = Maps(self.config["gmaps"])
-        district_map.set_city(district_name)
+    fire_locations = []
+    for i in range(number_of_fires):
+        fire_locations.append(city_map.get_random_point_in_weighted_probability_district)
 
-        output_image_to_path(
-            "out/{city_name}/{district_name}.png", district_map.get_city_map
-        )
-
-        district_maps[district_name] = district_map
-
+    return fire_locations
 
 def output_image_to_path(path: str, image) -> None:
     with open(path, "wb") as f:
