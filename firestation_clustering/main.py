@@ -4,6 +4,7 @@ import statistics
 from fire import Fire
 import yaml
 from sklearn.cluster import KMeans
+from firestation_clustering.mapbox import MapBox
 
 from firestation_clustering.maps import Maps
 
@@ -141,6 +142,11 @@ class CommandsHandler:
                 logging.info(best_station_index)
                 fire_stations[i] = potential_stations[best_station_index]
         f_stations.close()
+
+    def test(self):
+        mb = MapBox()
+        coordinates = [(-122.42, 37.78), (-122.45, 37.91), (-122.48, 37.73)]
+        logging.info(mb.distance_matrix(coordinates))
 
     def testing(self):
         dict_population_info = {
