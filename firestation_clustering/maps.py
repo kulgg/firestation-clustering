@@ -30,17 +30,6 @@ class Maps:
         ]
         self.prev_stations = []
 
-    def set_city(self, city_name):
-        geocode_result = self.gmaps.geocode(city_name)[0]
-        bounds = geocode_result["geometry"]["bounds"]
-
-        self.city = Area(
-            min_lat=bounds["southwest"]["lat"],
-            max_lat=bounds["northeast"]["lat"],
-            min_lng=bounds["southwest"]["lng"],
-            max_lng=bounds["northeast"]["lng"],
-        )
-
     def get_random_point(self, probablistic: bool = False):
         lat = random.uniform(self.city.min_lat, self.city.max_lat)
         lng = random.uniform(self.city.min_lng, self.city.max_lng)
