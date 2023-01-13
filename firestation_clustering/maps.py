@@ -4,6 +4,8 @@ import googlemaps
 from dataclasses import dataclass
 from numpy.random import choice
 
+from firestation_clustering.mapbox import MapBox
+
 
 @dataclass
 class Area:
@@ -15,7 +17,7 @@ class Area:
 
 class Maps:
     def __init__(self, config):
-        #self.gmaps: googlemaps.Client = googlemaps.Client(key=config["api-key"])
+        self.mb = MapBox(config["mapbox"]["token"])
         self.city = Area(51.410443, 51.531295, 7.102131, 7.349272)
         
         #1 "Bochum-Mitte": 103918,
@@ -88,19 +90,13 @@ class Maps:
     def get_city_map(self):
         center_lat = (self.city.min_lat + self.city.max_lat) / 2
         center_lng = (self.city.min_lng + self.city.max_lng) / 2
+        center = [center_lat, center_lng]
 
-        map_img = self.gmaps.static_map(
-            center=f"{center_lat},{center_lng}", size=(1000, 1000), zoom=11.8
-        )
+        map_img = self.mb.static_map(center, width=1200, height=1200, pitch=0)
 
         return map_img
 
-    def get_driving_time_matrix(self, origins, destinations):
-        matrix = self.gmaps.distance_matrix(origins, destinations, mode="driving")
+    def get_driving_time_matrix(self, points):
+        matrix = self.mb.distance_matrix(points)
 
-        driving_time = [
-            [row["elements"][i]["duration"]["value"] for i in range(len(destinations))]
-            for row in matrix["rows"]
-        ]
-
-        return driving_time
+        return matrix["durations"]

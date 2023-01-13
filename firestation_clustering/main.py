@@ -30,7 +30,7 @@ class CommandsHandler:
         self.config = config
 
     def kmeans_euclid(self, city, num_stations, num_fires=100, iterations=10):
-        maps = Maps(self.config["gmaps"])
+        maps = Maps(self.config)
         maps.set_city(city)
 
         city_dir_path = f"out/{city}/euclid"
