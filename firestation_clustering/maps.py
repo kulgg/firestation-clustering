@@ -20,7 +20,7 @@ class District(Area):
 class Maps:
     def __init__(self, config):
         self.gmaps: googlemaps.Client = googlemaps.Client(key=config["api-key"])
-        self.city = Area(49.0, 50.0, 7.0, 8.0)
+        self.city = Area(51.410443, 51.531295, 7.102131, 7.349272)
         self.districts: List[District] = [
             District(49.0, 50.0, 7.0, 8.0, 0.28),
             District(49.0, 50.0, 7.0, 8.0, 0.28),
