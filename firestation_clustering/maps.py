@@ -47,12 +47,11 @@ class Maps:
 
         return (lat, lng)
 
-    def get_random_point_in_weighted_probability_district(self):
+    def get_random_point_weighted_by_population(self):
+        index_of_chosen_district = choice([0, 1, 2, 3, 4, 5], 1, p=self.district_probabilites)[0]
 
-        index_of_chosen_district = choice([0, 1, 2, 3, 4, 5], 1, p=self.district_probabilites)
-
-        lat = random.uniform(self.district_locations[index_of_chosen_district][0], self.district_locations[index_of_chosen_district][1])
-        long = random.uniform(self.district_locations[index_of_chosen_district][2], self.district_locations[index_of_chosen_district][3])
+        lat = random.uniform(self.district_locations[index_of_chosen_district].min_lat, self.district_locations[index_of_chosen_district].max_lat)
+        long = random.uniform(self.district_locations[index_of_chosen_district].min_lng, self.district_locations[index_of_chosen_district].max_lng)
 
         return (lat, long)
 
@@ -76,11 +75,14 @@ class Maps:
         if len(markers_string) + len(fires) <= 150:
             markers_string.append(fire_markers_string)
 
-        map_img = self.gmaps.static_map(
-            center=f"{center_lat},{center_lng}",
-            size=(1000, 1000),
-            zoom=11.8,
-            markers=markers_string,
+        map_img = self.mb.static_map(
+            center=[center_lat, center_lng],
+            fires=fires,
+            stations=stations,
+            width=1200,
+            height=1200,
+            zoom=14,
+            pitch=0
         )
 
         self.prev_stations = [s for s in stations]

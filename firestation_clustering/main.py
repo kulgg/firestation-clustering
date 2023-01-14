@@ -145,36 +145,35 @@ class CommandsHandler:
 
     def test(self):
         mb = MapBox(self.config["mapbox"]["token"])
-        # coordinates = [(-122.42, 37.78), (-122.45, 37.91), (-122.48, 37.73)]
-        # logging.info(mb.distance_matrix(coordinates))
+        maps = Maps(self.config)
+        coordinates = [(-122.42, 37.78), (-122.45, 37.91), (-122.48, 37.73)]
+        logging.info(maps.get_random_point_weighted_by_population())
+        
+        # logging.info(mb.distance_matrix())
 
-        output_image_to_path(
-            "out/test.jpg",
-            mb.static_map(
-                [
-                    51.410443,
-                    7.102131,
-                ],
-                width=1200,
-                height=1200,
-                bearing=0.3,
-            ),
-        )
-
-    def testing(self):
-        maps = Maps(self.config["gmaps"])
-        maps.get_random_point_in_weighted_probability_district()
+        # output_image_to_path(
+        #     "out/test.jpg",
+        #     mb.static_map(
+        #         [
+        #             51.410443,
+        #             7.102131,
+        #         ],
+        #         width=1200,
+        #         height=1200,
+        #         bearing=0.0,
+        #     ),
+        # )
 
 
 # returns single map with spawned fires
 # parameters: city_name is the name of the whole city, the district_population_info is a dict with key of district_name and value of population number
 def get_fire_of_districts(self, number_of_fires) -> list:
-    city_map = Maps(self.config["gmaps"])
+    city_map = Maps(self.config)
     city_map.set_city("Bochum")
 
     fire_locations = []
     for i in range(number_of_fires):
-        fire_locations.append(city_map.get_random_point_in_weighted_probability_district)
+        fire_locations.append(city_map.get_random_point_weighted_by_population)
 
     return fire_locations
 
