@@ -37,28 +37,19 @@ class CommandsHandler:
         if not os.path.exists(city_dir_path):
             os.makedirs(city_dir_path)
 
-        fire_stations = []
-        for i in range(num_stations):
-            lat, lng = maps.get_random_point()
-            fire_stations.append((lat, lng))
+        stations = [maps.get_random_point() for _ in range(num_stations)]
 
         for i in range(iterations):
-            fires = []
-            for _ in range(num_fires):
-                lat, lng = maps.get_random_point()
-                fires.append((lat, lng))
+            fires = [maps.get_random_point() for _ in range(num_fires)]
 
-            map_img = maps.get_city_map_with_fires_and_stations(fires, fire_stations)
+            map_img = maps.get_city_map_with_fires_and_stations(fires, stations)
 
-            with open(f"out/{city}/euclid/{i}.png", "wb") as f:
-                for chunk in map_img:
-                    if chunk:
-                        f.write(chunk)
+            output_image_to_path(f"out/{city}/euclid/{i}.png", map_img)
 
             kmeans = KMeans(
-                n_clusters=num_stations, init=fire_stations, n_init=1, max_iter=1
+                n_clusters=num_stations, init=stations, n_init=1, max_iter=1
             ).fit(fires)
-            fire_stations = kmeans.cluster_centers_
+            stations = kmeans.cluster_centers_
 
     def kmeans_driving_time(self, city, num_stations, num_fires=100, iterations=10):
         maps = Maps(self.config["gmaps"])
@@ -159,16 +150,19 @@ class CommandsHandler:
             [51.478328, 7.120075],
         ]
 
+        fires = [[51.472238, 7.185753]]
+
         output_image_to_path(
             "out/test.jpg",
             mb.static_map(
                 maps.get_city_center(),
                 stations=stations,
+                fires=fires,
                 width=1200,
                 height=1200,
                 bearing=0,
                 pitch=0,
-                zoom=11,
+                zoom=12,
             ),
         )
 
@@ -177,11 +171,10 @@ class CommandsHandler:
 # parameters: city_name is the name of the whole city, the district_population_info is a dict with key of district_name and value of population number
 def get_fire_of_districts(self, number_of_fires) -> list:
     city_map = Maps(self.config)
-    city_map.set_city("Bochum")
-
-    fire_locations = []
-    for i in range(number_of_fires):
-        fire_locations.append(city_map.get_random_point_weighted_by_population)
+    fire_locations = [
+        city_map.get_random_point_weighted_by_population()
+        for _ in range(number_of_fires)
+    ]
 
     return fire_locations
 

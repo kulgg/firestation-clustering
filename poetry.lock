@@ -47,6 +47,7 @@ mypy-extensions = ">=0.4.3"
 pathspec = ">=0.9.0"
 platformdirs = ">=2"
 tomli = {version = ">=1.1.0", markers = "python_full_version < \"3.11.0a7\""}
+typing-extensions = {version = ">=3.10.0.0", markers = "python_version < \"3.10\""}
 
 [package.extras]
 colorama = ["colorama (>=0.4.3)"]
@@ -154,6 +155,18 @@ files = [
 mccabe = ">=0.7.0,<0.8.0"
 pycodestyle = ">=2.10.0,<2.11.0"
 pyflakes = ">=3.0.0,<3.1.0"
+
+[[package]]
+name = "geojson"
+version = "2.5.0"
+description = "Python bindings and utilities for GeoJSON"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "geojson-2.5.0-py2.py3-none-any.whl", hash = "sha256:ccbd13368dd728f4e4f13ffe6aaf725b6e802c692ba0dde628be475040c534ba"},
+    {file = "geojson-2.5.0.tar.gz", hash = "sha256:6e4bb7ace4226a45d9c8c8b1348b3fc43540658359f93c3f7e03efa9f15f658a"},
+]
 
 [[package]]
 name = "googlemaps"
@@ -577,6 +590,18 @@ files = [
 ]
 
 [[package]]
+name = "typing-extensions"
+version = "4.4.0"
+description = "Backported and Experimental Type Hints for Python 3.7+"
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "typing_extensions-4.4.0-py3-none-any.whl", hash = "sha256:16fa4864408f655d35ec496218b85f79b3437c829e93320c7c9215ccfd92489e"},
+    {file = "typing_extensions-4.4.0.tar.gz", hash = "sha256:1511434bb92bf8dd198c12b1cc812e800d4181cfcb867674e0f8279cc93087aa"},
+]
+
+[[package]]
 name = "urllib3"
 version = "1.26.13"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
@@ -595,5 +620,5 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.10"
-content-hash = "1c658c6df26fbf357c3fd74b3bf1a501d9d441fbd2af7a53323c3c0512576ce1"
+python-versions = "^3.9"
+content-hash = "06058055cd50bef3edb663e8f1227342ed008f70befe8b318ec2707d89cea768"

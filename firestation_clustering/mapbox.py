@@ -1,7 +1,8 @@
 import logging
 from typing import Tuple, List
 import requests
-import urllib.parse
+from geojson import Feature, Point, FeatureCollection
+import urllib
 
 
 class MapBox:
@@ -40,13 +41,28 @@ class MapBox:
             "access_token": self.token,
         }
 
-        stations = ",".join([f"[{s[1]},{s[0]}]" for s in stations])
-        markers = 'geojson({"type":"MultiPoint","coordinates":[STATIONS]})'
+        stations = [
+            Feature(
+                geometry=Point((s[1], s[0])),
+                properties={"marker-symbol": "fire-station", "marker-color": "#00FFFF"},
+            )
+            for s in stations
+        ]
+        fires = [
+            Feature(
+                geometry=Point((s[1], s[0])),
+                properties={"marker-color": "#FF0000"},
+            )
+            for s in fires
+        ]
+        stations.extend(fires)
+        feature_collection = FeatureCollection(stations)
+        # markers = 'geojson({"type":"MultiPoint","coordinates":[STATIONS]})'
+        # markers = 'geojson({"type":"FeatureCollection","features":[{"type":"MultiPoint","coordinates":[STATIONS]},{"type":"MultiPoint","coordinates":[FIRES]}]})'
 
-        markers = markers.replace("STATIONS", stations)
-        logging.info(markers)
+        markers = str(feature_collection)
 
-        url = f"https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/{markers}/{center[1]},{center[0]},{zoom},{bearing},{pitch}/{width}x{height}"
+        url = f"https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/geojson({urllib.parse.quote(markers)})/{center[1]},{center[0]},{zoom},{bearing},{pitch}/{width}x{height}"
         logging.info(url)
 
         response = requests.get(url, params=params)

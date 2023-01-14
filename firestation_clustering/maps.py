@@ -44,7 +44,7 @@ class Maps:
         center = [center_lat, center_lng]
         return center
 
-    def get_random_point_in_city(self):
+    def get_random_point(self):
         lat = random.uniform(self.city.min_lat, self.city.max_lat)
         lng = random.uniform(self.city.min_lng, self.city.max_lng)
 
@@ -67,27 +67,8 @@ class Maps:
         return (lat, long)
 
     def get_city_map_with_fires_and_stations(self, fires, stations):
-        center_lat = (self.city.min_lat + self.city.max_lat) / 2
-        center_lng = (self.city.min_lng + self.city.max_lng) / 2
-
-        fire_markers_string = "icon:https://i.ibb.co/8X2GjdL/fire.png|" + "|".join(
-            f"{lat},{lng}" for lat, lng in fires
-        )
-
-        station_markers_string = "color:blue|label:N|" + "|".join(
-            f"{lat},{lng}" for lat, lng in stations
-        )
-
-        prev_station_markers_string = "color:red|label:O|" + "|".join(
-            f"{lat},{lng}" for lat, lng in self.prev_stations
-        )
-
-        markers_string = [station_markers_string, prev_station_markers_string]
-        if len(markers_string) + len(fires) <= 150:
-            markers_string.append(fire_markers_string)
-
         map_img = self.mb.static_map(
-            center=[center_lat, center_lng],
+            center=self.get_city_center(),
             fires=fires,
             stations=stations,
             width=1200,
@@ -95,8 +76,6 @@ class Maps:
             zoom=14,
             pitch=0,
         )
-
-        self.prev_stations = [s for s in stations]
 
         return map_img
 
