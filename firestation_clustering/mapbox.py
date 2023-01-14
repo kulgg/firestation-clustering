@@ -17,12 +17,14 @@ class MapBox:
             ),
         )
 
-        coordinates = ";".join([f"{t[0]},{t[1]}" for t in coordinates])
+        coordinates = ";".join([f"{t[1]},{t[0]}" for t in coordinates])
 
         response = requests.get(
             f"https://api.mapbox.com/directions-matrix/v1/mapbox/driving/{coordinates}",
             params=params,
         )
+
+        logging.info(response.text)
 
         return response.json()
 

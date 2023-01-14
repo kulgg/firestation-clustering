@@ -1,6 +1,7 @@
 import logging
 import os
 import statistics
+from time import sleep
 from fire import Fire
 import yaml
 from sklearn.cluster import KMeans
@@ -62,44 +63,46 @@ class CommandsHandler:
             ).fit(fires)
             stations = kmeans.cluster_centers_
 
-    def kmeans_driving_time(self, city, num_stations, num_fires=100, iterations=10):
-        maps = Maps(self.config["gmaps"])
-        maps.set_city(city)
+    def kmeans_driving_time(
+        self,
+        num_stations,
+        weighted_probabilities=False,
+        num_fires=100,
+        iterations=10,
+        city="Bochum",
+    ):
+        maps = Maps(self.config)
 
         city_dir_path = f"out/{city}/driving-time"
         if not os.path.exists(city_dir_path):
             os.makedirs(city_dir_path)
 
-        fire_stations = []
-        for i in range(num_stations):
-            lat, lng = maps.get_random_point()
-            fire_stations.append((lat, lng))
+        stations = [maps.get_random_point() for _ in range(num_stations)]
 
         f_stations = open(f"out/{city}/driving-time/stations.txt", "w")
         fires = []
         for j in range(iterations):
             logging.info("Iteration %d", j)
             f_stations.write(f"Iteration {j}\n")
-            f_stations.write(
-                " ".join(f"{lat},{lng}" for lat, lng in fire_stations) + "\n\n"
-            )
+            f_stations.write(" ".join(f"{lat},{lng}" for lat, lng in stations) + "\n\n")
 
-            map_img = maps.get_city_map_with_fires_and_stations(fires, fire_stations)
-            with open(f"out/{city}/driving-time/{j}.png", "wb") as f:
-                for chunk in map_img:
-                    if chunk:
-                        f.write(chunk)
+            map_img = maps.get_city_map_with_fires_and_stations(fires, stations)
+            output_image_to_path(f"out/{city}/driving-time/{j}.png", map_img)
 
-            fires = []
-            for _ in range(num_fires):
-                lat, lng = maps.get_random_point()
-                fires.append((lat, lng))
+            fires = [
+                maps.get_random_point()
+                if not weighted_probabilities
+                else maps.get_random_point_weighted_by_population()
+                for _ in range(num_fires)
+            ]
 
             # every row contains the driving time seconds to all fire stations for a fire
             num_fires_per_request = 100 // num_stations
             driving_time = []
-            for chunk in chunker(fires, num_fires_per_request):
-                driving_time.extend(maps.get_driving_time_matrix(chunk, fire_stations))
+            # for chunk in chunker(fires, num_fires_per_request):
+            for fire in fires:
+                driving_time.append(maps.get_driving_time_matrix([fire, *stations])[0])
+                sleep(0.1)
 
             # The nearby fires of all fire stations
             nearby_fires = [[] for i in range(num_stations)]
@@ -119,19 +122,15 @@ class CommandsHandler:
                 lat /= len(nearby_fires[i])
                 lng /= len(nearby_fires[i])
 
-                potential_stations = [(lat, lng), fire_stations[i]]
-                potential_stations.extend(nearby_fires[i])
+                potential_stations = [(lat, lng), stations[i], *nearby_fires[i]]
                 logging.info("Len potential_stations %d", len(potential_stations))
 
-                num_per_request = 100 // len(potential_stations)
                 driving_time = []
-                for chunk in chunker(potential_stations, num_per_request):
-                    tmp = [[] for _ in range(len(chunk))]
-                    for chunk_two in chunker(potential_stations, num_per_request):
-                        res = maps.get_driving_time_matrix(chunk, chunk_two)
-                        for k in range(len(chunk)):
-                            tmp[k].extend(res[k])
-                    driving_time.extend(tmp)
+                for ps in potential_stations:
+                    driving_time.append(
+                        maps.get_driving_time_matrix([ps, *potential_stations])[0]
+                    )
+                    sleep(0.1)
 
                 assert len(driving_time) == len(potential_stations)
                 driving_time = [
@@ -142,7 +141,7 @@ class CommandsHandler:
                 logging.info(best_mean_drive_time)
                 best_station_index = driving_time.index(best_mean_drive_time)
                 logging.info(best_station_index)
-                fire_stations[i] = potential_stations[best_station_index]
+                stations[i] = potential_stations[best_station_index]
         f_stations.close()
 
     def test(self):
