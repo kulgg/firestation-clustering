@@ -39,10 +39,14 @@ class MapBox:
         params = {
             "access_token": self.token,
         }
-        
-        markers = '{"type":"Point","coordinates":[7.154114,51.521568]}'
-        
-        url = f"https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/geojson({urllib.parse.quote(markers)})/{center[1]},{center[0]},{zoom},{bearing},{pitch}/{width}x{height}",
+
+        stations = ",".join([f"[{s[1]},{s[0]}]" for s in stations])
+        markers = 'geojson({"type":"MultiPoint","coordinates":[STATIONS]})'
+
+        markers = markers.replace("STATIONS", stations)
+        logging.info(markers)
+
+        url = f"https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/{markers}/{center[1]},{center[0]},{zoom},{bearing},{pitch}/{width}x{height}"
         logging.info(url)
 
         response = requests.get(url, params=params)

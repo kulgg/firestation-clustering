@@ -146,23 +146,31 @@ class CommandsHandler:
     def test(self):
         mb = MapBox(self.config["mapbox"]["token"])
         maps = Maps(self.config)
-        coordinates = [(-122.42, 37.78), (-122.45, 37.91), (-122.48, 37.73)]
-        logging.info(maps.get_random_point_weighted_by_population())
-        
-        # logging.info(mb.distance_matrix())
+        # coordinates = [(-122.42, 37.78), (-122.45, 37.91), (-122.48, 37.73)]
+        # logging.info(maps.get_random_point_weighted_by_population())
 
-        # output_image_to_path(
-        #     "out/test.jpg",
-        #     mb.static_map(
-        #         [
-        #             51.410443,
-        #             7.102131,
-        #         ],
-        #         width=1200,
-        #         height=1200,
-        #         bearing=0.0,
-        #     ),
-        # )
+        stations = [
+            [51.410443, 7.102131],
+            [51.521568, 7.154114],
+            [51.505821, 7.102756],
+            [51.532128, 7.232064],
+            [51.504190, 7.254022],
+            [51.475234, 7.185753],
+            [51.478328, 7.120075],
+        ]
+
+        output_image_to_path(
+            "out/test.jpg",
+            mb.static_map(
+                maps.get_city_center(),
+                stations=stations,
+                width=1200,
+                height=1200,
+                bearing=0,
+                pitch=0,
+                zoom=11,
+            ),
+        )
 
 
 # returns single map with spawned fires
@@ -176,6 +184,7 @@ def get_fire_of_districts(self, number_of_fires) -> list:
         fire_locations.append(city_map.get_random_point_weighted_by_population)
 
     return fire_locations
+
 
 def output_image_to_path(path: str, image) -> None:
     with open(path, "wb") as f:

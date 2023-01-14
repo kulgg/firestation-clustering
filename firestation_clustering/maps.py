@@ -19,15 +19,15 @@ class Maps:
     def __init__(self, config):
         self.mb = MapBox(config["mapbox"]["token"])
         self.city = Area(51.410443, 51.531295, 7.102131, 7.349272)
-        
-        #1 "Bochum-Mitte": 103918,
-        #2 "Bochum-Wattenscheid": 72821,
-        #3 "Bochum-Nord": 35458,
-        #4 "Bochum-Ost": 52885,
-        #5 "Bochum-Süd": 50612,
-        #6 "Bochum-Südwest": 54452,
-        #totale anzahl in bochum = 370.146
-        
+
+        # 1 "Bochum-Mitte": 103918,
+        # 2 "Bochum-Wattenscheid": 72821,
+        # 3 "Bochum-Nord": 35458,
+        # 4 "Bochum-Ost": 52885,
+        # 5 "Bochum-Süd": 50612,
+        # 6 "Bochum-Südwest": 54452,
+        # totale anzahl in bochum = 370.146
+
         self.district_locations: List[Area] = [
             Area(51.457411, 51.521568, 7.154114, 7.266257),
             Area(51.436690, 51.505821, 7.102756, 7.180607),
@@ -36,10 +36,13 @@ class Maps:
             Area(51.412156, 51.475234, 7.185753, 7.298447),
             Area(51.412594, 51.478328, 7.120075, 7.217956),
         ]
-
         self.district_probabilites = [0.28, 0.20, 0.10, 0.14, 0.13, 0.15]
 
-        self.prev_stations = []
+    def get_city_center(self):
+        center_lat = (self.city.min_lat + self.city.max_lat) / 2
+        center_lng = (self.city.min_lng + self.city.max_lng) / 2
+        center = [center_lat, center_lng]
+        return center
 
     def get_random_point_in_city(self):
         lat = random.uniform(self.city.min_lat, self.city.max_lat)
@@ -48,10 +51,18 @@ class Maps:
         return (lat, lng)
 
     def get_random_point_weighted_by_population(self):
-        index_of_chosen_district = choice([0, 1, 2, 3, 4, 5], 1, p=self.district_probabilites)[0]
+        index_of_chosen_district = choice(
+            [0, 1, 2, 3, 4, 5], 1, p=self.district_probabilites
+        )[0]
 
-        lat = random.uniform(self.district_locations[index_of_chosen_district].min_lat, self.district_locations[index_of_chosen_district].max_lat)
-        long = random.uniform(self.district_locations[index_of_chosen_district].min_lng, self.district_locations[index_of_chosen_district].max_lng)
+        lat = random.uniform(
+            self.district_locations[index_of_chosen_district].min_lat,
+            self.district_locations[index_of_chosen_district].max_lat,
+        )
+        long = random.uniform(
+            self.district_locations[index_of_chosen_district].min_lng,
+            self.district_locations[index_of_chosen_district].max_lng,
+        )
 
         return (lat, long)
 
@@ -82,7 +93,7 @@ class Maps:
             width=1200,
             height=1200,
             zoom=14,
-            pitch=0
+            pitch=0,
         )
 
         self.prev_stations = [s for s in stations]
@@ -90,10 +101,7 @@ class Maps:
         return map_img
 
     def get_city_map(self):
-        center_lat = (self.city.min_lat + self.city.max_lat) / 2
-        center_lng = (self.city.min_lng + self.city.max_lng) / 2
-        center = [center_lat, center_lng]
-
+        center = self.get_city_center()
         map_img = self.mb.static_map(center, width=1200, height=1200, pitch=0)
 
         return map_img
