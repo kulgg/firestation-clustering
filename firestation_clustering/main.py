@@ -29,9 +29,15 @@ class CommandsHandler:
     def __init__(self, config):
         self.config = config
 
-    def kmeans_euclid(self, city, num_stations, num_fires=100, iterations=10):
+    def kmeans_euclid(
+        self,
+        num_stations,
+        weighted_probabilities=False,
+        num_fires=100,
+        iterations=10,
+        city="Bochum",
+    ):
         maps = Maps(self.config)
-        maps.set_city(city)
 
         city_dir_path = f"out/{city}/euclid"
         if not os.path.exists(city_dir_path):
@@ -40,7 +46,12 @@ class CommandsHandler:
         stations = [maps.get_random_point() for _ in range(num_stations)]
 
         for i in range(iterations):
-            fires = [maps.get_random_point() for _ in range(num_fires)]
+            fires = [
+                maps.get_random_point()
+                if not weighted_probabilities
+                else maps.get_random_point_weighted_by_population()
+                for _ in range(num_fires)
+            ]
 
             map_img = maps.get_city_map_with_fires_and_stations(fires, stations)
 
