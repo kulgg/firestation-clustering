@@ -12,7 +12,10 @@
 
 - [x] Switch everything to mapbox
 - [x] Probabilistic fire spawning
-- [ ] Log all relevant data in every iteration
+- [x] Log all relevant data in every iteration
   - Firestation locations
   - Fire locations
   - Driving times /euclid distance
+- [ ] Add kmeans_driving_time results output
+- [ ] Run experiments
+- [ ] Calculate final average driving time for all experiments
