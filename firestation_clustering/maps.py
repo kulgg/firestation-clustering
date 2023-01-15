@@ -74,7 +74,7 @@ class Maps:
             stations=stations,
             width=1200,
             height=1200,
-            zoom=11.5,
+            zoom=11.8,
             pitch=0,
         )
 

@@ -32,19 +32,29 @@ class CommandsHandler:
 
     def kmeans_euclid(
         self,
-        num_stations,
         weighted_probabilities=False,
         num_fires=100,
         iterations=10,
         city="Bochum",
     ):
+        num_stations = 4
         maps = Maps(self.config)
 
-        city_dir_path = f"out/{city}/euclid"
+        city_dir_path = f"out/{city}/euclid/{weighted_probabilities}"
         if not os.path.exists(city_dir_path):
             os.makedirs(city_dir_path)
 
-        stations = [maps.get_random_point() for _ in range(num_stations)]
+        # Actual stations
+        # Grünstraße 31
+        # Bessemerstraße 26
+        # Brandwacht 1
+        # Hattinger Straße 410
+        stations = [
+            (51.4735733, 7.1513713),
+            (51.476891, 7.2019071),
+            (51.4885055, 7.2962569),
+            (51.4424334, 7.1891685),
+        ]
 
         for i in range(iterations):
             fires = [
@@ -54,9 +64,9 @@ class CommandsHandler:
                 for _ in range(num_fires)
             ]
 
-            map_img = maps.get_city_map_with_fires_and_stations(fires, stations)
+            map_img = maps.get_city_map_with_fires_and_stations([], stations)
 
-            output_image_to_path(f"out/{city}/euclid/{i}.png", map_img)
+            output_image_to_path(f"{city_dir_path}/{i}.png", map_img)
 
             kmeans = KMeans(
                 n_clusters=num_stations, init=stations, n_init=1, max_iter=1
