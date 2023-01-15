@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import statistics
@@ -9,9 +10,11 @@ from firestation_clustering.helper import (
     get_centers,
     get_nearby_fires,
 )
+from firestation_clustering.json_encoder import EnhancedJsonEncoder
 from firestation_clustering.mapbox import MapBox
 
 from firestation_clustering.maps import Maps
+from firestation_clustering.results import Iteration, Results, Station
 
 
 def chunker(seq, size):
@@ -39,12 +42,12 @@ class CommandsHandler:
         weighted_probabilities=False,
         use_haversine=True,
         num_fires=100,
-        iterations=10,
+        num_iterations=10,
         city="Bochum",
     ):
         maps = Maps(self.config)
 
-        type_str = "haversine" if use_haversine else "euclid-new"
+        type_str = "haversine" if use_haversine else "euclid"
 
         city_dir_path = f"out/{city}/{type_str}/{weighted_probabilities}"
         if not os.path.exists(city_dir_path):
@@ -62,7 +65,11 @@ class CommandsHandler:
             (51.4424334, 7.1891685),
         ]
 
-        for i in range(iterations):
+        results = Results(
+            [], type_str, weighted_probabilities, num_fires, num_iterations
+        )
+
+        for i in range(num_iterations):
             fires = [
                 maps.get_random_point()
                 if not weighted_probabilities
@@ -70,17 +77,47 @@ class CommandsHandler:
                 for _ in range(num_fires)
             ]
 
-            map_img = maps.get_city_map_with_fires_and_stations([], stations)
+            # map_img = maps.get_city_map_with_fires_and_stations([], stations)
 
-            output_image_to_path(f"{city_dir_path}/{i}.png", map_img)
-
+            # output_image_to_path(f"{city_dir_path}/{i}.png", map_img)
             fires_near_stations = get_nearby_fires(stations, fires, use_haversine)
             avg_distance_to_fires = get_average_distances(
                 stations, fires_near_stations, use_haversine
             )
             overall_avg_distance = statistics.mean(avg_distance_to_fires)
             logging.info(overall_avg_distance)
+
+            results.iterations.append(
+                Iteration(
+                    average_distance=overall_avg_distance,
+                    stations=[
+                        Station(
+                            coordinates=stations[j],
+                            nearby_fires=fires_near_stations[j],
+                            distance=avg_distance_to_fires[j],
+                        )
+                        for j in range(len(stations))
+                    ],
+                )
+            )
             stations = get_centers(stations, fires_near_stations)
+
+        results.iterations.append(
+            Iteration(
+                average_distance=overall_avg_distance,
+                stations=[
+                    Station(
+                        coordinates=stations[j],
+                        nearby_fires=fires_near_stations[j],
+                        distance=avg_distance_to_fires[j],
+                    )
+                    for j in range(len(stations))
+                ],
+            )
+        )
+        results_fp = open(f"{city_dir_path}/results.json", "w")
+        json.dump(results, results_fp, cls=EnhancedJsonEncoder, sort_keys=True)
+        results_fp.close()
 
     def kmeans_driving_time(
         self,
