@@ -4,7 +4,11 @@ import statistics
 from time import sleep
 from fire import Fire
 import yaml
-from sklearn.cluster import KMeans
+from firestation_clustering.helper import (
+    get_average_distances,
+    get_centers,
+    get_nearby_fires,
+)
 from firestation_clustering.mapbox import MapBox
 
 from firestation_clustering.maps import Maps
@@ -30,17 +34,19 @@ class CommandsHandler:
     def __init__(self, config):
         self.config = config
 
-    def kmeans_euclid(
+    def kmeans(
         self,
         weighted_probabilities=False,
+        use_haversine=True,
         num_fires=100,
         iterations=10,
         city="Bochum",
     ):
-        num_stations = 4
         maps = Maps(self.config)
 
-        city_dir_path = f"out/{city}/euclid/{weighted_probabilities}"
+        type_str = "haversine" if use_haversine else "euclid-new"
+
+        city_dir_path = f"out/{city}/{type_str}/{weighted_probabilities}"
         if not os.path.exists(city_dir_path):
             os.makedirs(city_dir_path)
 
@@ -68,10 +74,13 @@ class CommandsHandler:
 
             output_image_to_path(f"{city_dir_path}/{i}.png", map_img)
 
-            kmeans = KMeans(
-                n_clusters=num_stations, init=stations, n_init=1, max_iter=1
-            ).fit(fires)
-            stations = kmeans.cluster_centers_
+            fires_near_stations = get_nearby_fires(stations, fires, use_haversine)
+            avg_distance_to_fires = get_average_distances(
+                stations, fires_near_stations, use_haversine
+            )
+            overall_avg_distance = statistics.mean(avg_distance_to_fires)
+            logging.info(overall_avg_distance)
+            stations = get_centers(stations, fires_near_stations)
 
     def kmeans_driving_time(
         self,
@@ -107,7 +116,6 @@ class CommandsHandler:
             ]
 
             # every row contains the driving time seconds to all fire stations for a fire
-            num_fires_per_request = 100 // num_stations
             driving_time = []
             # for chunk in chunker(fires, num_fires_per_request):
             for fire in fires:

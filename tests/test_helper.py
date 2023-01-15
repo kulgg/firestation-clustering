@@ -1,5 +1,5 @@
 from firestation_clustering.helper import (
-    get_average_distance,
+    get_average_distances,
     get_centers,
     get_nearby_fires,
 )
@@ -11,7 +11,7 @@ def test_get_nearby_fires():
 
     expected = [[(50.2, 7.0)], [(51.2, 7.0)], [(50.0, 8.2)], [(50.5, 8.0)]]
 
-    actual = get_nearby_fires(stations, fires)
+    actual = get_nearby_fires(stations, fires, True)
 
     assert len(expected) == len(actual)
     assert expected == actual
@@ -26,7 +26,7 @@ def test_get_average_distance():
         22.239016046706613,
         14.294959707570287,
         55.59754011676653,
-    ] == get_average_distance(stations, nearby_fires)
+    ] == get_average_distances(stations, nearby_fires, True)
 
 
 def test_get_centers():

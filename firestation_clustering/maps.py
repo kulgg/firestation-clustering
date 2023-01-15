@@ -1,7 +1,5 @@
-import logging
 import random
 from typing import List
-import googlemaps
 from dataclasses import dataclass
 from numpy.random import choice
 
