@@ -183,6 +183,18 @@ files = [
 requests = ">=2.20.0,<3.0"
 
 [[package]]
+name = "haversine"
+version = "2.7.0"
+description = "Calculate the distance between 2 points on Earth."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "haversine-2.7.0-py2.py3-none-any.whl", hash = "sha256:4fdf9aebb4cc59c7de6fcb06f7afa6ab54720c5d9c91dac8c173b9213920434c"},
+    {file = "haversine-2.7.0.tar.gz", hash = "sha256:9dd62c95bff9c43eb898604625e80db68b8b9e91a5111338f55ebcf470dd5a3d"},
+]
+
+[[package]]
 name = "idna"
 version = "3.4"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -621,4 +633,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "06058055cd50bef3edb663e8f1227342ed008f70befe8b318ec2707d89cea768"
+content-hash = "ee3b0e455869cce20c2b6299eec844768db6b14d29d9262f6f73d23b9a0b6b9d"
