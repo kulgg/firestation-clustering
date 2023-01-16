@@ -43,6 +43,13 @@ def get_average_distances(stations, nearby_fires, use_haversine):
     ]
 
 
+def get_average_duration(stations, nearby_fires):
+    return [
+        statistics.mean(get_distance(f, stations[i]) for f in nearby_fires[i])
+        for i in range(len(stations))
+    ]
+
+
 def get_centers(stations, nearby_fires):
     return [
         (

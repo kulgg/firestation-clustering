@@ -16,6 +16,24 @@
   - Firestation locations
   - Fire locations
   - Driving times /euclid distance
-- [ ] Add kmeans_driving_time results output
+- [x] Add kmeans_driving_time results output
 - [ ] Run experiments
 - [ ] Calculate final average driving time for all experiments
+
+## Experiments
+
+- euclid uniform
+- euclid weighted probabilities
+- haversine uniform
+- haversine weighted probabilities
+- driving_time uniform
+- driving_time weighted probabilities
+
+Let's assume we have 1000 fires for the final metric.
+How many matrix elements do we need?
+-> ` 1000 * 4 * 6 = 24000`
+
+For driving_time training we need
+-> `2* 20 * 200 * 4 = 32000`
+
+Total matrix elements: `66000`

@@ -9,7 +9,11 @@ class MapBox:
     def __init__(self, token):
         self.token = token
 
-    def distance_matrix(self, coordinates: List[Tuple[float, float]]):
+    def distance_matrix(
+        self,
+        sources: List[Tuple[float, float]],
+        destinations: List[Tuple[float, float]],
+    ):
         params = (
             (
                 "access_token",
@@ -17,14 +21,18 @@ class MapBox:
             ),
         )
 
-        coordinates = ";".join([f"{t[1]},{t[0]}" for t in coordinates])
+        coordinates = ";".join([f"{t[1]},{t[0]}" for t in [*sources, *destinations]])
+
+        source_indeces = ";".join([str(i) for i in range(len(sources))])
+        destination_indeces = ";".join(
+            [str(len(sources) + i) for i in range(len(destinations))]
+        )
+        url = f"https://api.mapbox.com/directions-matrix/v1/mapbox/driving/{coordinates}?sources={source_indeces}&destinations={destination_indeces}"
 
         response = requests.get(
-            f"https://api.mapbox.com/directions-matrix/v1/mapbox/driving/{coordinates}",
+            url,
             params=params,
         )
-
-        logging.info(response.text)
 
         return response.json()
 

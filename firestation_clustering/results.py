@@ -18,7 +18,7 @@ class Iteration:
 @dataclass
 class Results:
     iterations: List[Iteration]
-    experiment_type: str  # haversine, euclid, driving tim
+    experiment_type: str  # haversine, euclid, driving_time
     weighted_probabilities: bool  # Spawn fires with probabilities weighted by population
     num_fires: int
     num_iterations: int

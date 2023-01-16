@@ -84,7 +84,7 @@ class Maps:
 
         return map_img
 
-    def get_driving_time_matrix(self, points):
-        matrix = self.mb.distance_matrix(points)
+    def get_driving_time_matrix(self, sources, destinations):
+        matrix = self.mb.distance_matrix(sources, destinations)
 
         return matrix["durations"]
