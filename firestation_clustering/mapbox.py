@@ -1,4 +1,3 @@
-import logging
 from typing import Tuple, List
 import requests
 from geojson import Feature, Point, FeatureCollection
