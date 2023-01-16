@@ -31,9 +31,9 @@
 
 Let's assume we have 1000 fires for the final metric.
 How many matrix elements do we need?
--> ` 1000 * 4 * 6 = 24000`
+-> `1000 * 4 * 6 = 24000`
 
 For driving_time training we need
--> `2* 20 * 200 * 4 = 32000`
+-> `2 * 20 * 400 * 4 = 64000`
 
-Total matrix elements: `66000`
+Total matrix elements: `88000`

@@ -80,7 +80,7 @@ class Maps:
 
     def get_city_map(self):
         center = self.get_city_center()
-        map_img = self.mb.static_map(center, width=1200, height=1200, pitch=0)
+        map_img = self.mb.static_map(center, width=2000, height=2000, pitch=0)
 
         return map_img
 

@@ -49,7 +49,9 @@ class CommandsHandler:
 
         type_str = "haversine" if use_haversine else "euclid"
 
-        city_dir_path = f"out/{city}/{type_str}/{weighted_probabilities}"
+        city_dir_path = (
+            f"{self.config['out-dir']}/{city}/{type_str}/{weighted_probabilities}"
+        )
         if not os.path.exists(city_dir_path):
             os.makedirs(city_dir_path)
 
@@ -69,17 +71,17 @@ class CommandsHandler:
             [], type_str, weighted_probabilities, num_fires, num_iterations
         )
 
+        fires = [
+            maps.get_random_point()
+            if not weighted_probabilities
+            else maps.get_random_point_weighted_by_population()
+            for _ in range(num_fires)
+        ]
+
         for i in range(num_iterations):
-            fires = [
-                maps.get_random_point()
-                if not weighted_probabilities
-                else maps.get_random_point_weighted_by_population()
-                for _ in range(num_fires)
-            ]
+            map_img = maps.get_city_map_with_fires_and_stations([], stations)
+            output_image_to_path(f"{city_dir_path}/{i}.png", map_img)
 
-            # map_img = maps.get_city_map_with_fires_and_stations([], stations)
-
-            # output_image_to_path(f"{city_dir_path}/{i}.png", map_img)
             fires_near_stations = get_nearby_fires(stations, fires, use_haversine)
             avg_distance_to_fires = get_average_distances(
                 stations, fires_near_stations, use_haversine
@@ -115,7 +117,9 @@ class CommandsHandler:
     ):
         maps = Maps(self.config)
 
-        city_dir_path = f"out/{city}/driving-time"
+        city_dir_path = (
+            f"{self.config['out-dir']}/{city}/driving-time/{weighted_probabilities}"
+        )
         if not os.path.exists(city_dir_path):
             os.makedirs(city_dir_path)
 
@@ -135,8 +139,8 @@ class CommandsHandler:
         for j in range(num_iterations):
             logging.info("Iteration %d", j)
 
-            # map_img = maps.get_city_map_with_fires_and_stations(fires, stations)
-            # output_image_to_path(f"out/{city}/driving-time/{j}.png", map_img)
+            map_img = maps.get_city_map_with_fires_and_stations([], stations)
+            output_image_to_path(f"{city_dir_path}/{j}.png", map_img)
 
             fires = [
                 maps.get_random_point()

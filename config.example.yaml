@@ -2,3 +2,4 @@ gmaps:
   api-key: ""
 mapbox:
   token: ""
+out-dir: ""
