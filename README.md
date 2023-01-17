@@ -17,8 +17,8 @@
   - Fire locations
   - Driving times /euclid distance
 - [x] Add kmeans_driving_time results output
-- [ ] Run experiments
-- [ ] Calculate final average driving time for all experiments
+- [x] Run experiments
+- [x] Calculate final average driving time for all experiments
 
 ## Experiments
 
