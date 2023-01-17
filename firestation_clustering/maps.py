@@ -78,6 +78,24 @@ class Maps:
 
         return map_img
 
+    def get_illustration_map(
+        self, existing, euclid, haversine, driving_time, driving_time_optimized=[]
+    ):
+        map_img = self.mb.illustration_map(
+            center=self.get_city_center(),
+            existing=existing,
+            euclid=euclid,
+            haversine=haversine,
+            driving_time=driving_time,
+            driving_time_optimized=driving_time_optimized,
+            width=1200,
+            height=1200,
+            zoom=11.8,
+            pitch=0,
+        )
+
+        return map_img
+
     def get_city_map(self):
         center = self.get_city_center()
         map_img = self.mb.static_map(center, width=2000, height=2000, pitch=0)

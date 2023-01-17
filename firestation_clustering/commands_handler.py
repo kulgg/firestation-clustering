@@ -38,6 +38,44 @@ class CommandsHandler:
     def __init__(self, config):
         self.config = config
 
+    def generate_final_map(self):
+        maps = Maps(self.config)
+        existing = [
+            (51.4735733, 7.1513713),
+            (51.476891, 7.2019071),
+            (51.4885055, 7.2962569),
+            (51.4424334, 7.1891685),
+        ]
+        euclid = [
+            (51.47245392978444, 7.147501976477574),
+            (51.49232739162623, 7.2358511760625746),
+            (51.48300707784984, 7.298210507839832),
+            (51.44473197091044, 7.198928760278175),
+        ]
+        haversine = [
+            (51.474001930039734, 7.147011393401474),
+            (51.4929028984444, 7.226083416835239),
+            (51.483984973653676, 7.296241882147966),
+            (51.43483513712803, 7.1957966993464675),
+        ]
+        driving_time = [
+            (51.491289419753606, 7.168785569142202),
+            (51.513886508587774, 7.244975565572561),
+            (51.47095676026824, 7.262863693913191),
+            (51.45053508209907, 7.149948683900617),
+        ]
+        driving_time_optimized = [
+            (51.45410416630261, 7.1378363521449),
+            (51.50152413549118, 7.150421492681692),
+            (51.49305774375556, 7.258674229154215),
+            (51.4424334, 7.1891685),
+        ]
+
+        map_img = maps.get_illustration_map(
+            existing, euclid, haversine, driving_time, driving_time_optimized
+        )
+        output_image_to_path(f"{self.config['out-dir']}/map.png", map_img)
+
     def avg_driving_duration(self, weighted_probabilities: bool):
         fires_fn = (
             "fires_uniform.txt" if not weighted_probabilities else "fires_weighted.txt"

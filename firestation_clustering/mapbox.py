@@ -76,3 +76,73 @@ class MapBox:
         response = requests.get(url, params=params)
 
         return response.content
+
+    def illustration_map(
+        self,
+        center: Tuple[float, float],
+        existing: List[Tuple[float, float]] = [],
+        euclid: List[Tuple[float, float]] = [],
+        haversine: List[Tuple[float, float]] = [],
+        driving_time: List[Tuple[float, float]] = [],
+        driving_time_optimized: List[Tuple[float, float]] = [],
+        zoom=14,
+        bearing=0,
+        pitch=60,
+        width=400,
+        height=400,
+    ):
+        params = {
+            "access_token": self.token,
+        }
+
+        existing = [
+            Feature(
+                geometry=Point((s[1], s[0])),
+                properties={"marker-symbol": "fire-station", "marker-color": "#8B2635"},
+            )
+            for s in existing
+        ]
+        euclid = [
+            Feature(
+                geometry=Point((s[1], s[0])),
+                properties={"marker-symbol": "fire-station", "marker-color": "#FA003F"},
+            )
+            for s in euclid
+        ]
+        haversine = [
+            Feature(
+                geometry=Point((s[1], s[0])),
+                properties={"marker-symbol": "fire-station", "marker-color": "#41EAD4"},
+            )
+            for s in haversine
+        ]
+        driving_time = [
+            Feature(
+                geometry=Point((s[1], s[0])),
+                properties={"marker-symbol": "fire-station", "marker-color": "#125E8A"},
+            )
+            for s in driving_time
+        ]
+        driving_time_optimized = [
+            Feature(
+                geometry=Point((s[1], s[0])),
+                properties={"marker-symbol": "fire-station", "marker-color": "#FF9F1C"},
+            )
+            for s in driving_time_optimized
+        ]
+
+        euclid.extend(haversine)
+        euclid.extend(driving_time)
+        euclid.extend(driving_time_optimized)
+        euclid.extend(existing)
+        feature_collection = FeatureCollection(euclid)
+        # markers = 'geojson({"type":"MultiPoint","coordinates":[STATIONS]})'
+        # markers = 'geojson({"type":"FeatureCollection","features":[{"type":"MultiPoint","coordinates":[STATIONS]},{"type":"MultiPoint","coordinates":[FIRES]}]})'
+
+        markers = str(feature_collection)
+
+        url = f"https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/geojson({urllib.parse.quote(markers)})/{center[1]},{center[0]},{zoom},{bearing},{pitch}/{width}x{height}"
+
+        response = requests.get(url, params=params)
+
+        return response.content
