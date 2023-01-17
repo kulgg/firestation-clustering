@@ -1,6 +1,21 @@
-# Experiment Results
+# Experiment Results For Bochum
 
 ## Uniform Fires
+
+### Existing stations
+
+```
+[(51.4735733, 7.1513713),
+(51.476891, 7.2019071),
+(51.4885055, 7.2962569),
+(51.4424334, 7.1891685)]
+```
+
+**Average driving durations**
+`[739.615107913669, 641.968085106383, 706.7792682926829, 738.2057017543859]`
+
+**Total average driving duration**
+`706.642041 secs = ~11.8 mins`
 
 ### Euclid
 
@@ -54,6 +69,21 @@ Final station coordinates
 `641.143080 secs = ~10.7 mins`
 
 ## Fires with population-density weighted probability
+
+### Existing stations
+
+```
+[(51.4735733, 7.1513713),
+(51.476891, 7.2019071),
+(51.4885055, 7.2962569),
+(51.4424334, 7.1891685)]
+```
+
+**Average driving durations**
+`[608.5437869822485, 575.2540178571429, 601.3586666666666, 628.5853448275863]`
+
+**Total average driving duration**
+`603.435454 secs = ~10.1 mins`
 
 ### Euclid
 

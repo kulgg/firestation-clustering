@@ -48,12 +48,12 @@ class CommandsHandler:
         fires_fd.close()
 
         stations = [
-            (51.491289419753606, 7.168785569142202),
-            (51.513886508587774, 7.244975565572561),
-            (51.47095676026824, 7.262863693913191),
-            (51.45053508209907, 7.149948683900617),
+            (51.4735733, 7.1513713),
+            (51.476891, 7.2019071),
+            (51.4885055, 7.2962569),
+            (51.4424334, 7.1891685),
         ]
-        logging.info("Driving time weighted")
+        logging.info("Existing weighted")
         logging.info(len(fires))
 
         maps = Maps(self.config)
