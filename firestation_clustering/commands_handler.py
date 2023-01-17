@@ -1,3 +1,4 @@
+import random
 from time import sleep
 import json
 import logging
@@ -48,12 +49,12 @@ class CommandsHandler:
         fires_fd.close()
 
         stations = [
-            (51.4735733, 7.1513713),
-            (51.476891, 7.2019071),
-            (51.4885055, 7.2962569),
+            (51.45410416630261, 7.1378363521449),
+            (51.50152413549118, 7.150421492681692),
+            (51.49305774375556, 7.258674229154215),
             (51.4424334, 7.1891685),
         ]
-        logging.info("Existing weighted")
+        logging.info("Driving time optimized weighted")
         logging.info(len(fires))
 
         maps = Maps(self.config)
@@ -182,14 +183,17 @@ class CommandsHandler:
 
     def kmeans_driving_time(
         self,
+        optimized: bool,
         weighted_probabilities=False,
         num_iterations=10,
         city="Bochum",
     ):
         maps = Maps(self.config)
 
+        run_name = "driving-time" if not optimized else "driving-time-optimized"
+
         city_dir_path = (
-            f"{self.config['out-dir']}/{city}/driving-time/{weighted_probabilities}"
+            f"{self.config['out-dir']}/{city}/{run_name}/{weighted_probabilities}"
         )
         if not os.path.exists(city_dir_path):
             os.makedirs(city_dir_path)
@@ -204,7 +208,7 @@ class CommandsHandler:
         fires_fn = (
             "fires_uniform.txt" if not weighted_probabilities else "fires_weighted.txt"
         )
-        fires_fd = open(f"{self.config['out-dir']}/{fires_fn}", "r")
+        fires_fd = open(f"{self.config['out-dir']}/fires_kmeans/{fires_fn}", "r")
         fires = [
             tuple(map(float, line.split(","))) for line in fires_fd.read().splitlines()
         ]
@@ -272,31 +276,41 @@ class CommandsHandler:
                 lat /= len(nearby_fires[i])
                 lng /= len(nearby_fires[i])
 
-                stations[i] = (lat, lng)
+                if not optimized:
+                    stations[i] = (lat, lng)
+                    continue
+
+                potential_stations = [
+                    (lat, lng),
+                    stations[i],
+                    *random.sample(nearby_fires[i], 18),
+                ]
+                logging.info("Len potential_stations %d", len(potential_stations))
+
+                driving_time = []
+                for k in range(len(potential_stations)):
+                    driving_time.append(
+                        maps.get_driving_time_matrix(
+                            [potential_stations[k]],
+                            [x for idx, x in enumerate(potential_stations) if idx != k],
+                        )[0]
+                    )
+                    sleep(1)
+
+                assert len(driving_time) == len(potential_stations)
+                driving_time = [
+                    statistics.mean(drive_times_from_station)
+                    for drive_times_from_station in driving_time
+                ]
+                best_mean_drive_time = min(driving_time)
+                logging.info(best_mean_drive_time)
+                best_station_index = driving_time.index(best_mean_drive_time)
+                logging.info(best_station_index)
+                stations[i] = potential_stations[best_station_index]
 
         results_fp = open(f"{city_dir_path}/results.json", "w")
         json.dump(results, results_fp, cls=EnhancedJsonEncoder, sort_keys=True)
         results_fp.close()
-        #     potential_stations = [(lat, lng), stations[i], *nearby_fires[i]]
-        #     logging.info("Len potential_stations %d", len(potential_stations))
-
-        #     driving_time = []
-        #     for ps in potential_stations:
-        #         driving_time.append(
-        #             maps.get_driving_time_matrix([ps, *potential_stations])[0]
-        #         )
-        #         sleep(0.1)
-
-        #     assert len(driving_time) == len(potential_stations)
-        #     driving_time = [
-        #         statistics.mean(drive_times_from_station)
-        #         for drive_times_from_station in driving_time
-        #     ]
-        #     best_mean_drive_time = min(driving_time)
-        #     logging.info(best_mean_drive_time)
-        #     best_station_index = driving_time.index(best_mean_drive_time)
-        #     logging.info(best_station_index)
-        #     stations[i] = potential_stations[best_station_index]
 
     def test(self):
         mb = MapBox(self.config["mapbox"]["token"])

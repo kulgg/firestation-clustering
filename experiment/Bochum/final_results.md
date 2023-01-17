@@ -135,3 +135,20 @@ Final station coordinates
 
 **Total average driving duration**
 `556.160096 secs = ~9.3 mins`
+
+### Driving Time Optimized
+
+Final station coordinates
+
+```
+[(51.45410416630261, 7.1378363521449),
+(51.50152413549118, 7.150421492681692),
+(51.49305774375556, 7.258674229154215),
+(51.4424334, 7.1891685)]
+```
+
+**Average driving durations**
+`[419.73554502369666, 425.9084210526316, 533.5428899082568, 610.4730061349693]`
+
+**Total average driving duration**
+`497.414966 secs = ~8.3 mins`
